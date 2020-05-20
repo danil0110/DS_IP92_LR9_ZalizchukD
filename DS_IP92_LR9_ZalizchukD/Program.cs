@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 
 namespace DS_IP92_LR9_ZalizchukD
 {
@@ -67,16 +68,8 @@ namespace DS_IP92_LR9_ZalizchukD
             }
         }
 
-        public void Test(List<List<double>> towns)
+        public void Output(List<List<double>> towns)
         {
-            Console.WriteLine("Координаты точек");
-            for (int i = 0; i < n; i++)
-            {
-                Console.WriteLine($"{i + 1}: ({rebra[i, 0]}, {rebra[i, 1]});");
-            }
-            Console.WriteLine();
-            Console.WriteLine("Матрица расстояний");
-
             Console.Write($"{" ", 6}");
             for (int i = 0; i < columns.Count; i++)
             {
@@ -104,8 +97,14 @@ namespace DS_IP92_LR9_ZalizchukD
         {
             List<List<double>> towns = new List<List<double>>();
             InitTowns(towns);
+            Output(towns);
             
-            Test(towns);
+            EachRowMin(towns);
+            RowReduction(towns);
+            EachColumnMin(towns);
+            ColumnReduction(towns);
+
+            
         }
 
         private void InitTowns(List<List<double>> towns)
@@ -118,6 +117,61 @@ namespace DS_IP92_LR9_ZalizchukD
                     towns[i].Add(distances[i, j]);
                 }
             }
+        }
+
+        private void EachRowMin(List<List<double>> towns)
+        {
+            minRow = new List<double>();
+            for (int i = 0; i < towns.Count; i++)
+            {
+                minRow.Add(towns[i].Min());
+            }
+        }
+
+        private void RowReduction(List<List<double>> towns)
+        {
+            for (int i = 0; i < towns.Count; i++)
+            {
+                for (int j = 0; j < towns[i].Count; j++)
+                {
+                    if (towns[i][j] != Double.MaxValue)
+                        towns[i][j] = Math.Round(towns[i][j] - minRow[i], 2);
+                }
+            }
+            
+            Console.WriteLine("Редукция строк");
+            Output(towns);
+            
+        }
+
+        private void EachColumnMin(List<List<double>> towns)
+        {
+            minColumn = new List<double>();
+            for (int i = 0; i < towns.Count; i++)
+            {
+                minColumn.Add(towns[0][i]);
+                for (int j = 0; j < towns[i].Count; j++)
+                {
+                    if (minColumn[i] > towns[j][i])
+                        minColumn[i] = towns[j][i];
+                }
+            }
+        }
+
+        private void ColumnReduction(List<List<double>> towns)
+        {
+            for (int i = 0; i < towns.Count; i++)
+            {
+                minColumn.Add(towns[0][i]);
+                for (int j = 0; j < towns[i].Count; j++)
+                {
+                    towns[j][i] = Math.Round(towns[j][i] - minColumn[i], 2);
+                }
+            }
+            
+            Console.WriteLine("Редукция столбцов");
+            Output(towns);
+            
         }
         
     }
