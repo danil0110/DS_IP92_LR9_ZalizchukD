@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 
@@ -11,7 +12,8 @@ namespace DS_IP92_LR9_ZalizchukD
             string path = "input.txt";
             Graph graph = new Graph(path);
             
-            graph.Test();
+            graph.Traveler();
+            //graph.Test();
         }
     }
 
@@ -20,6 +22,8 @@ namespace DS_IP92_LR9_ZalizchukD
         private int n;
         private int[,] rebra;
         private double[,] distances;
+        private List<int> rows, columns;
+        private List<double> minRow, minColumn;
 
         public Graph(string path)
         {
@@ -29,6 +33,8 @@ namespace DS_IP92_LR9_ZalizchukD
             n = Convert.ToInt32(temp[0]);
             distances = new double[n, n];
             rebra = new int[n, 2];
+            rows = new List<int>();
+            columns = new List<int>();
             
             for (int i = 0; i < n; i++)
             {
@@ -38,6 +44,8 @@ namespace DS_IP92_LR9_ZalizchukD
                     b = Convert.ToInt32(temp[1]);
                 rebra[i, 0] = a;
                 rebra[i, 1] = b;
+                rows.Add(i);
+                columns.Add(i);
             }
             
             CalculateDistances();
@@ -59,7 +67,7 @@ namespace DS_IP92_LR9_ZalizchukD
             }
         }
 
-        public void Test()
+        public void Test(List<List<double>> towns)
         {
             Console.WriteLine("Координаты точек");
             for (int i = 0; i < n; i++)
@@ -70,19 +78,19 @@ namespace DS_IP92_LR9_ZalizchukD
             Console.WriteLine("Матрица расстояний");
 
             Console.Write($"{" ", 6}");
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < columns.Count; i++)
             {
-                Console.Write($"{i + 1, 6}");
+                Console.Write($"{columns[i] + 1, 6}");
             }
             Console.WriteLine();
             
-            for (int i = 0; i < n; i++)
+            for (int i = 0; i < rows.Count; i++)
             {
-                Console.Write($"{i + 1, 6}");
+                Console.Write($"{rows[i] + 1, 6}");
                 for (int j = 0; j < n; j++)
                 {
-                    if (distances[i, j] != Double.MaxValue)
-                        Console.Write($"{distances[i, j], 6}");
+                    if (towns[i][j] != Double.MaxValue)
+                        Console.Write($"{towns[i][j], 6}");
                     else
                     {
                         Console.Write($"{"INF", 6}");
@@ -94,7 +102,22 @@ namespace DS_IP92_LR9_ZalizchukD
 
         public void Traveler()
         {
+            List<List<double>> towns = new List<List<double>>();
+            InitTowns(towns);
             
+            Test(towns);
+        }
+
+        private void InitTowns(List<List<double>> towns)
+        {
+            for (int i = 0; i < n; i++)
+            {
+                towns.Add(new List<double>());
+                for (int j = 0; j < n; j++)
+                {
+                    towns[i].Add(distances[i, j]);
+                }
+            }
         }
         
     }
